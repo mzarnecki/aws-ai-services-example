@@ -86,7 +86,12 @@ def usage_demo():
     print("Welcome to the Amazon Bedrock demo.")
     print("-" * 88)
 
-    bedrock_client = boto3.client(service_name="bedrock", region_name="us-east-1")
+    bedrock_client = boto3.client(
+        service_name="bedrock",
+        aws_access_key_id='XXX',
+        aws_secret_access_key='XXX',
+        region_name="eu-central-1"
+    )
 
     wrapper = BedrockWrapper(bedrock_client)
 
@@ -110,25 +115,24 @@ def usage_demo():
         raise
 
 def generate():
-    boto3_bedrock = boto3.client('bedrock-runtime')
+    boto3_bedrock = boto3.client(
+        'bedrock-runtime',
+        aws_access_key_id='XXX',
+        aws_secret_access_key='XXX',
+        region_name="eu-central-1")
 
     # create the prompt
-    prompt_data = "2+2=?"
+    prompt_data = "Human:2+2=? Assistant:"
 
-    body = json.dumps({"inputText": prompt_data, "textGenerationConfig": {"topP": 0.95, "temperature": 0.1}})
+    body = json.dumps({"prompt": prompt_data, "max_tokens_to_sample": 300})
 
-    modelId = 'amazon.titan-text-premier-v1:0'
-    accept = 'application/json'
+    modelId = 'anthropic.claude-instant-v1'
     contentType = 'application/json'
 
-    response = boto3_bedrock.invoke_model(body=body, modelId=modelId, accept=accept, contentType=contentType)
+    response = boto3_bedrock.invoke_model(body=body, modelId=modelId, contentType=contentType)
     response_body = json.loads(response.get('body').read())
 
-    outputText = response_body.get('results')[0].get('outputText')
-
-
-    email = outputText[outputText.index('\n') + 1:]
-    print(email)
+    print(response_body['completion'])
 
 
 def print_model_details(model):
