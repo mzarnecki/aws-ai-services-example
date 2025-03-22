@@ -9,9 +9,7 @@ Bedrock models.
 """
 
 import logging
-import boto3
 from botocore.exceptions import ClientError
-import json
 
 logger = logging.getLogger(__name__)
 
@@ -73,86 +71,3 @@ class BedrockWrapper:
 
 
 # snippet-end:[python.example_code.bedrock.BedrockWrapper.class]
-
-
-def usage_demo():
-    """
-    Shows how to list the available foundation models.
-    This demonstration gets the list of available foundation models and
-    prints their respective summaries.
-    """
-    logging.basicConfig(level=logging.INFO)
-    print("-" * 88)
-    print("Welcome to the Amazon Bedrock demo.")
-    print("-" * 88)
-
-    bedrock_client = boto3.client(
-        service_name="bedrock",
-        aws_access_key_id='XXX',
-        aws_secret_access_key='XXX',
-        region_name="eu-central-1"
-    )
-
-    wrapper = BedrockWrapper(bedrock_client)
-
-    print("Listing the available foundation models.")
-
-    try:
-        for model in wrapper.list_foundation_models():
-            print_model_details(model)
-    except ClientError:
-        logger.exception("Couldn't list foundation models.")
-        raise
-
-    print("Getting the details of an individual foundation model.")
-
-    model_id = "amazon.titan-embed-text-v1"
-
-    try:
-        print_model_details(wrapper.get_foundation_model(model_id))
-    except ClientError:
-        logger.exception(f"Couldn't get foundation model {model_id}.")
-        raise
-
-def generate():
-    boto3_bedrock = boto3.client(
-        'bedrock-runtime',
-        aws_access_key_id='XXX',
-        aws_secret_access_key='XXX',
-        region_name="eu-central-1")
-
-    # create the prompt
-    prompt_data = "Human:2+2=? Assistant:"
-
-    body = json.dumps({"prompt": prompt_data, "max_tokens_to_sample": 300})
-
-    modelId = 'anthropic.claude-instant-v1'
-    contentType = 'application/json'
-
-    response = boto3_bedrock.invoke_model(body=body, modelId=modelId, contentType=contentType)
-    response_body = json.loads(response.get('body').read())
-
-    print(response_body['completion'])
-
-
-def print_model_details(model):
-    print("\n" + "=" * 42)
-    print(f' Model: {model["modelId"]}')
-    print("-" * 42)
-    print(f' Name: {model["modelName"]}')
-    print(f' Provider: {model["providerName"]}')
-    print(f' Model ARN: {model["modelArn"]}')
-    print(f' Lifecycle status: {model["modelLifecycle"]["status"]}')
-    print(f' Input modalities: {model["inputModalities"]}')
-    print(f' Output modalities: {model["outputModalities"]}')
-    print(f' Supported customizations: {model["customizationsSupported"]}')
-    print(f' Supported inference types: {model["inferenceTypesSupported"]}')
-    if "responseStreamingSupported" in model:
-        print(f' Response streaming supported: {model["responseStreamingSupported"]}')
-
-    print("=" * 42)
-
-
-if __name__ == "__main__":
-    # usage_demo()
-    generate()
