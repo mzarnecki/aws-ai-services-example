@@ -134,17 +134,3 @@ def usage_demo():
     print("Thanks for watching!")
     print('-'*88)
 # snippet-end:[python.example_code.rekognition.Usage_ImageDetection]
-
-def recognize_img(path: str, labelsNum=5):
-    logging.basicConfig(level=logging.INFO, format='%(levelname)s: %(message)s')
-    rekognition_client = boto3.client('rekognition')
-    img = RekognitionImage.from_file(path, rekognition_client)
-    labels = img.detect_labels(labelsNum)
-    labelsDict = {}
-    for label in labels:
-        if label.instances:
-            labelsDict[label.name] = label.to_dict()
-    return labelsDict
-
-if __name__ == '__main__':
-    usage_demo()
