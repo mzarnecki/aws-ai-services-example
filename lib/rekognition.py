@@ -18,7 +18,7 @@ from pprint import pprint
 import boto3
 from botocore.exceptions import ClientError
 
-from rekognition_objects import (RekognitionLabel, show_bounding_boxes)
+from lib.rekognition_objects import (RekognitionLabel, show_bounding_boxes)
 
 logger = logging.getLogger(__name__)
 
